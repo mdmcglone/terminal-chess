@@ -19,14 +19,12 @@ fn main() {
 
         ];
 
-    //INNER GAME LOOP SOMEWHERE IN HERE
+    //INNER GAME LOOP BEGINS SOMEWHERE IN HERE
+
     
     // iterate thru all pieces and get their file and rank
     for piece in all_pieces.iter_mut() {
 
-        // println!("{:?}", piece.get_file());
-        // println!("{:?}", piece.get_rank());
-        
         let ifile = piece.get_rank();
         let irank = piece.get_file();
         
@@ -36,32 +34,13 @@ fn main() {
         map[file-1][rank-1] = piece.get_kind();
 
     };
-                  
+                
 
     render_board(blocktop, blockbody, map);
 
-    // println!("{:?}", map);
+    // all_pieces[0].move_piece(2, 3);    
 
-    // let w = King{
-    //     rank: 0,
-    //     file: 0,
-    //     yt: true,
-    // };
-
-    // let b = King{
-    //     rank: 0,
-    //     file: 0,
-    //     yt: false,
-    // };
     
-    // for i in 0..5 {
-    //     println!("{}", w.render()[i])
-    // }
-
-    // for i in 0..5 {
-    //     println!("{}", b.render()[i])
-    // }
- 
 
 }
 
@@ -72,15 +51,18 @@ fn render_board(blocktop: &str, blockbody: &str, map: Vec<Vec<&str>>) {
         for i in 0..=8 {
             print!("{blocktop}"); // print top row
         }
+
         print!("\n");
         for layer in 0..= 4 {  // print block height
             for number in 0..=7 {  // print block number across
 
                 let p = render_piece(map[7-letter][number]);
 
-                //insert p[layer] into the center of blockbody
-                let mut blockbody_filled = String::from(blockbody);
-                blockbody_filled.insert_str(5, p[layer]);
+                //insert piece[layer] into the center of blockbody
+                let mut blockbody_filled = String::from(blockbody); // copy blockbody
+                let len_to_span = blockbody_filled.len() - p[layer].len(); // get length of blockbody to span
+                blockbody_filled = String::from(&blockbody_filled[..len_to_span]);  // trim blockbody to size of p[layer]
+                blockbody_filled.insert_str(blockbody_filled.len()/2+1, p[layer]); // insert p[layer] into center of blockbody
 
                 // if number == 0, add rank number
                 if number == 0 {
@@ -98,6 +80,7 @@ fn render_board(blocktop: &str, blockbody: &str, map: Vec<Vec<&str>>) {
         }
 
     }
+
     for i in 0..=8 {  // print bottom row
         print!("{blocktop}");
     }
@@ -200,6 +183,16 @@ impl Piece {
         }
     }
 
+    fn move_piece(self, rank: i8, file: i8) {
+        match self {
+            Piece::Knight(mut p) => p.change(rank, file),
+            Piece::King(mut p) => p.change(rank, file),
+            Piece::Queen(mut p) => p.change(rank, file),
+            Piece::Bishop(mut p) => p.change(rank, file),
+            Piece::Rook(mut p) => p.change(rank, file),
+            Piece::Pawn(mut p) => p.change(rank, file),
+        }
+    }
 
 }
 
@@ -211,12 +204,13 @@ struct Pawn {
 }
 
 impl Pawn {
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
 
         if self.yt == true {
+            let attack = false;
             if attack == false {
                 if self.rank == nrank + 1 {
                     true
@@ -239,8 +233,8 @@ impl Pawn {
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -256,7 +250,7 @@ struct Rook {
 }
 
 impl Rook {    
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -268,8 +262,8 @@ impl Rook {
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -286,7 +280,7 @@ struct Knight {
 }
 
 impl Knight {    
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -303,8 +297,8 @@ impl Knight {
            }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -321,7 +315,7 @@ struct Bishop {
 }
 
 impl Bishop {    
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -339,8 +333,8 @@ impl Bishop {
         
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -357,7 +351,7 @@ struct Queen {
 }
 
 impl Queen {
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -379,8 +373,8 @@ impl Queen {
         
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -397,7 +391,7 @@ struct King {
 }
 
 impl King {    
-    fn legal(&self, nrank: i8, nfile: i8, attack: bool) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -414,8 +408,8 @@ impl King {
            }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8, attack: bool) {
-        if self.legal(nrank, nfile, attack) == true{
+    fn change(&mut self, nrank: i8, nfile: i8) {
+        if self.legal(nrank, nfile) == true{
             self.rank = nrank;
             self.file = nfile;
         }
@@ -503,7 +497,13 @@ fn gather_pieces() -> Vec<Piece> {
     return pieces;
 }
 
-
+fn generate_blockbody(letter: &usize, number: &usize) -> String {
+    if letter + number % 2 == 0 {
+        return String::from("|           ");
+    } else {
+        return String::from("|xxxxxxxxxxx");
+    }
+}
 
 // white pawn
 //   0
@@ -599,3 +599,4 @@ fn gather_pieces() -> Vec<Piece> {
 // |···········|
 // |···········|
 // -------------
+
