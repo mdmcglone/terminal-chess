@@ -343,41 +343,41 @@ impl King {
 
 // return a list of all pieces in initial positions
 pub fn gather_pieces() -> Vec<Piece> {
-    let w_apawn = Piece::Pawn(Pawn{rank:2, file:1, yt:true, id:String::from("w_apawn")});
-    let w_bpawn = Piece::Pawn(Pawn{rank:2, file:2, yt:true, id:String::from("w_bpawn")});
-    let w_cpawn = Piece::Pawn(Pawn{rank:2, file:3, yt:true, id:String::from("w_cpawn")});
-    let w_dpawn = Piece::Pawn(Pawn{rank:2, file:4, yt:true, id:String::from("w_dpawn")});
-    let w_epawn = Piece::Pawn(Pawn{rank:2, file:5, yt:true, id:String::from("w_epawn")});
-    let w_fpawn = Piece::Pawn(Pawn{rank:2, file:6, yt:true, id:String::from("w_fpawn")});
-    let w_gpawn = Piece::Pawn(Pawn{rank:2, file:7, yt:true, id:String::from("w_gpawn")});
-    let w_hpawn = Piece::Pawn(Pawn{rank:2, file:8, yt:true, id:String::from("w_hpawn")});
+    let w_apawn = Piece::Pawn(Pawn{rank:2, file:1, yt:true, id:String::from("a")});
+    let w_bpawn = Piece::Pawn(Pawn{rank:2, file:2, yt:true, id:String::from("b")});
+    let w_cpawn = Piece::Pawn(Pawn{rank:2, file:3, yt:true, id:String::from("c")});
+    let w_dpawn = Piece::Pawn(Pawn{rank:2, file:4, yt:true, id:String::from("d")});
+    let w_epawn = Piece::Pawn(Pawn{rank:2, file:5, yt:true, id:String::from("e")});
+    let w_fpawn = Piece::Pawn(Pawn{rank:2, file:6, yt:true, id:String::from("f")});
+    let w_gpawn = Piece::Pawn(Pawn{rank:2, file:7, yt:true, id:String::from("g")});
+    let w_hpawn = Piece::Pawn(Pawn{rank:2, file:8, yt:true, id:String::from("h")});
     
-    let w_arook = Piece::Rook(Rook{rank:1, file:1, yt:true, id:String::from("w_arook")});
-    let w_bknight = Piece::Knight(Knight{rank:1, file:2, yt:true, id:String::from("w_bknight")});
-    let w_cbishop = Piece::Bishop(Bishop{rank:1, file:3, yt:true, id:String::from("w_cbishop")});
-    let w_queen = Piece::Queen(Queen{rank:1, file:4, yt:true, id:String::from("w_queen")});
-    let w_king = Piece::King(King{rank:1, file:5, yt:true, id:String::from("w_king")});
-    let w_fbishop = Piece::Bishop(Bishop{rank:1, file:6, yt:true, id:String::from("w_fbishop")});
-    let w_gknight = Piece::Knight(Knight{rank:1, file:7, yt:true, id:String::from("w_gknight")});
-    let w_hrook = Piece::Rook(Rook{rank:1, file:8, yt:true, id:String::from("w_hrook")});
+    let w_arook = Piece::Rook(Rook{rank:1, file:1, yt:true, id:String::from("R")});
+    let w_bknight = Piece::Knight(Knight{rank:1, file:2, yt:true, id:String::from("N")});
+    let w_cbishop = Piece::Bishop(Bishop{rank:1, file:3, yt:true, id:String::from("B")});
+    let w_queen = Piece::Queen(Queen{rank:1, file:4, yt:true, id:String::from("Q")});
+    let w_king = Piece::King(King{rank:1, file:5, yt:true, id:String::from("K")});
+    let w_fbishop = Piece::Bishop(Bishop{rank:1, file:6, yt:true, id:String::from("B")});
+    let w_gknight = Piece::Knight(Knight{rank:1, file:7, yt:true, id:String::from("N")});
+    let w_hrook = Piece::Rook(Rook{rank:1, file:8, yt:true, id:String::from("R")});
 
-    let b_apawn = Piece::Pawn(Pawn{rank:7, file:1, yt:false, id:String::from("b_apawn")});
-    let b_bpawn = Piece::Pawn(Pawn{rank:7, file:2, yt:false, id:String::from("b_bpawn")});
-    let b_cpawn = Piece::Pawn(Pawn{rank:7, file:3, yt:false, id:String::from("b_cpawn")});
-    let b_dpawn = Piece::Pawn(Pawn{rank:7, file:4, yt:false, id:String::from("b_dpawn")});
-    let b_epawn = Piece::Pawn(Pawn{rank:7, file:5, yt:false, id:String::from("b_epawn")});
-    let b_fpawn = Piece::Pawn(Pawn{rank:7, file:6, yt:false, id:String::from("b_fpawn")});
-    let b_gpawn = Piece::Pawn(Pawn{rank:7, file:7, yt:false, id:String::from("b_gpawn")});
-    let b_hpawn = Piece::Pawn(Pawn{rank:7, file:8, yt:false, id:String::from("b_hpawn")});
+    let b_apawn = Piece::Pawn(Pawn{rank:7, file:1, yt:false, id:String::from("a")});
+    let b_bpawn = Piece::Pawn(Pawn{rank:7, file:2, yt:false, id:String::from("b")});
+    let b_cpawn = Piece::Pawn(Pawn{rank:7, file:3, yt:false, id:String::from("c")});
+    let b_dpawn = Piece::Pawn(Pawn{rank:7, file:4, yt:false, id:String::from("d")});
+    let b_epawn = Piece::Pawn(Pawn{rank:7, file:5, yt:false, id:String::from("e")});
+    let b_fpawn = Piece::Pawn(Pawn{rank:7, file:6, yt:false, id:String::from("f")});
+    let b_gpawn = Piece::Pawn(Pawn{rank:7, file:7, yt:false, id:String::from("g")});
+    let b_hpawn = Piece::Pawn(Pawn{rank:7, file:8, yt:false, id:String::from("h")});
 
-    let b_arook = Piece::Rook(Rook{rank:8, file:1, yt:false, id:String::from("b_arook")});
-    let b_bknight = Piece::Knight(Knight{rank:8, file:2, yt:false, id:String::from("b_bknight")});
-    let b_cbishop = Piece::Bishop(Bishop{rank:8, file:3, yt:false, id:String::from("b_cbishop")});
-    let b_queen = Piece::Queen(Queen{rank:8, file:4, yt:false, id:String::from("b_queen")});
-    let b_king = Piece::King(King{rank:8, file:5, yt:false, id:String::from("b_king")});
-    let b_fbishop = Piece::Bishop(Bishop{rank:8, file:6, yt:false, id:String::from("b_fbishop")});
-    let b_gknight = Piece::Knight(Knight{rank:8, file:7, yt:false, id:String::from("b_gknight")});
-    let b_hrook = Piece::Rook(Rook{rank:8, file:8, yt:false, id:String::from("b_hrook")});
+    let b_arook = Piece::Rook(Rook{rank:8, file:1, yt:false, id:String::from("R")});
+    let b_bknight = Piece::Knight(Knight{rank:8, file:2, yt:false, id:String::from("N")});
+    let b_cbishop = Piece::Bishop(Bishop{rank:8, file:3, yt:false, id:String::from("B")});
+    let b_queen = Piece::Queen(Queen{rank:8, file:4, yt:false, id:String::from("Q")});
+    let b_king = Piece::King(King{rank:8, file:5, yt:false, id:String::from("K")});
+    let b_fbishop = Piece::Bishop(Bishop{rank:8, file:6, yt:false, id:String::from("B")});
+    let b_gknight = Piece::Knight(Knight{rank:8, file:7, yt:false, id:String::from("N")});
+    let b_hrook = Piece::Rook(Rook{rank:8, file:8, yt:false, id:String::from("R")});
 
 
 
