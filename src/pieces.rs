@@ -79,9 +79,31 @@ impl Piece {
         }
     }
 
+    pub fn get_color(&self) -> &bool {
+        match self {
+            Piece::Knight(p) => &p.yt,
+            Piece::King(p) => &p.yt,
+            Piece::Queen(p) => &p.yt,
+            Piece::Bishop(p) => &p.yt,
+            Piece::Rook(p) => &p.yt,
+            Piece::Pawn(p) => &p.yt,
+        }
+    }
+
+    pub fn get_legal(&self, nrank: i8, nfile: i8) -> bool {
+        match self {
+            Piece::Knight(p) => p.legal(nrank, nfile),
+            Piece::King(p) => p.legal(nrank, nfile),
+            Piece::Queen(p) => p.legal(nrank, nfile),
+            Piece::Bishop(p) => p.legal(nrank, nfile),
+            Piece::Rook(p) => p.legal(nrank, nfile),
+            Piece::Pawn(p) => p.legal(nrank, nfile),
+        }
+    }
 
 
-    pub fn find_id(&self) -> &String {
+
+    pub fn get_id(&self) -> &String {
         match self {
             Piece::Knight(p) => &p.id,
             Piece::King(p) => &p.id,
@@ -92,16 +114,6 @@ impl Piece {
         }
     }
 
-    pub fn move_piece(self, rank: i8, file: i8) {
-        match self {
-            Piece::Knight(mut p) => p.change(rank, file),
-            Piece::King(mut p) => p.change(rank, file),
-            Piece::Queen(mut p) => p.change(rank, file),
-            Piece::Bishop(mut p) => p.change(rank, file),
-            Piece::Rook(mut p) => p.change(rank, file),
-            Piece::Pawn(mut p) => p.change(rank, file),
-        }
-    }
 
     pub fn return_piece(self) -> Piece {
         match self {
@@ -117,10 +129,10 @@ impl Piece {
 }
 
 pub struct Pawn {
-    rank: i8,
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl Pawn {
@@ -163,10 +175,10 @@ impl Pawn {
 }
 
 pub struct Rook {
-    rank: i8,
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl Rook {    
@@ -193,10 +205,10 @@ impl Rook {
 
 
 pub struct Knight {
-    rank: i8,
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl Knight {    
@@ -228,10 +240,10 @@ impl Knight {
 
 
 pub struct Bishop {
-    rank: i8,
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl Bishop {    
@@ -264,10 +276,10 @@ impl Bishop {
 
 
 pub struct Queen {
-    rank: i8,   
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,   
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl Queen {
@@ -304,10 +316,10 @@ impl Queen {
 
 
 pub struct King {
-    rank: i8,
-    file: i8,
-    yt: bool,
-    id: String,
+    pub rank: i8,
+    pub file: i8,
+    pub yt: bool,
+    pub id: String,
 }
 
 impl King {    
