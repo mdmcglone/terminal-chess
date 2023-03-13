@@ -32,7 +32,7 @@ fn main() {
 
         
         // iterate thru all pieces and get their file and rank
-        for piece in all_pieces.iter_mut() {
+        for piece in all_pieces.iter() {
 
             let ifile = piece.get_rank();
             let irank = piece.get_file();
@@ -45,7 +45,7 @@ fn main() {
         };
                     
 
-        render_board(blocktop, map);
+        render_board(blocktop, &map);
 
         // Steps to move a piece: 
         // 1. recieve nrank, nfile, piece from user
@@ -66,11 +66,7 @@ fn main() {
 
         io::stdin().read_line(&mut user_input).expect("Failed to read line");
 
-        println!("You entered: {}", user_input);
-
         let parsed_input = parse_input(user_input);
-
-
 
 
         
@@ -82,27 +78,30 @@ fn main() {
 
         let mut some_legal_move = 0;
         let mut original_piece = (&0, &0, &String::from("x"));
+        let mut illegal_move = false;
         for piece in all_pieces.iter() {
             // check that this move does not overlap with another piece on the same team
             if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() == &whose_turn {
                 println!("You cannot move to a square occupied by your own piece. Please try again.");
-                continue
+                illegal_move = true;
+                break
             }
 
             // check that this move is legal for some piece
-            if piece.get_legal(rank, file) == true && piece.get_color() == &whose_turn && piece.get_id() == &piece_kind {
+            if piece.get_legal(rank, file, &map) == true && piece.get_color() == &whose_turn && piece.get_id() == &piece_kind {
                 some_legal_move += 1;
-                println!("this move is legal for the {} at {} {}", piece.get_kind(), piece.get_rank(), piece.get_file());
                 original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
             } 
         }
 
-        if some_legal_move == 1 {
-            println!("Moving {} to {} {}", piece_kind, file, rank);
-        } else if some_legal_move > 1 {
+        if illegal_move == true {
+            continue
+        }
+
+        if some_legal_move > 1 {
             println!("There are multiple pieces that can move to this square. Please disambiguate.");
             continue
-        } else {
+        } else if some_legal_move == 0 {
             println!("This move is not legal.");
             continue
         }
@@ -156,7 +155,22 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
         println!("CASTLING");
     } 
 
-    let re = Regex::new(r"(?m)^[a-h][1-8]$|^[RNBQK].{0,2}[a-h][1-8]|^[a-h].{0,2}[a-h][1-8]$").unwrap();
+    let repawn = Regex::new(r"(?m)^[a-h][1-8]$").unwrap();
+    if repawn.is_match(&input) {
+
+        // take the first letter of the input as the file
+        let pawn_file = input.chars().nth(0).unwrap().to_string();
+        // take the second letter of the input as the rank
+        let rank = input.chars().nth(1).unwrap().to_string();
+        let rank = rank.parse::<i8>().unwrap();
+
+        // convert file to i8
+        let file = file_to_num(&pawn_file);
+
+        return Some((pawn_file, file, rank));
+    }
+
+    let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-8]$|^[RNBQK]x[a-h][1-8]$").unwrap();
     // use the regex string ^[a-zA-Z].*[a-zA-Z][0-9]$ to check if the input is valid
     if !re.is_match(&input) {
         println!("NO MATCH. Please try again.");

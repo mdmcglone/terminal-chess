@@ -1,4 +1,4 @@
-pub fn render_board(blocktop: &str, map: Vec<Vec<&str>>) {
+pub fn render_board(blocktop: &str, map: &Vec<Vec<&str>>) {
     for letter in 0..=7 {  // print block number down
 
         for i in 0..=8 {
@@ -55,7 +55,7 @@ fn render_piece(kind: &str) -> [&str; 5] {
         "WN" => return ["  ______"," /--- o ","/L -----","\\~~_____","     \\--"],
         "BN" => return ["  ______"," /    o ","/L      ","\\~~_____","     \\__"],
         "WB" => return ["    O    ","   /-\\   ","  /---\\  "," /- + -\\ ","~\\-----/~"],
-        "BB" => return ["    O    ","   / \\   ","  /   \\  "," /  +  \\ ","~\\     /~"],
+        "BB" => return ["    O    ","   / \\   ","  /   \\  "," /  +  \\ ","~\\_____/~"],
         "WQ" => return ["O O O O O","\\-|-|-|-/"," \\-----/ ","  \\---/  "," ======= "],
         "BQ" => return ["O O O O O","\\ | | | /"," \\     / ","  \\   /  "," ======= "],
         "WK" => return ["  __+__  "," /--|--\\ "," \\--|--/ "," /--|--\\ ","========="],

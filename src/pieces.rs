@@ -1,4 +1,4 @@
-use super::legality::on_board_and_diff;
+use super::legality::{on_board_and_diff, trace_move};
 
 pub enum Piece {
     Knight(Knight),
@@ -90,14 +90,14 @@ impl Piece {
         }
     }
 
-    pub fn get_legal(&self, nrank: i8, nfile: i8) -> bool {
+    pub fn get_legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         match self {
-            Piece::Knight(p) => p.legal(nrank, nfile),
-            Piece::King(p) => p.legal(nrank, nfile),
-            Piece::Queen(p) => p.legal(nrank, nfile),
-            Piece::Bishop(p) => p.legal(nrank, nfile),
-            Piece::Rook(p) => p.legal(nrank, nfile),
-            Piece::Pawn(p) => p.legal(nrank, nfile),
+            Piece::Knight(p) => p.legal(nrank, nfile, map),
+            Piece::King(p) => p.legal(nrank, nfile, map),
+            Piece::Queen(p) => p.legal(nrank, nfile, map),
+            Piece::Bishop(p) => p.legal(nrank, nfile, map),
+            Piece::Rook(p) => p.legal(nrank, nfile, map),
+            Piece::Pawn(p) => p.legal(nrank, nfile, map),
         }
     }
 
@@ -136,41 +136,55 @@ pub struct Pawn {
 }
 
 impl Pawn {
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
 
         if self.yt == true {
-            let attack = false;
-            if attack == false {
-                if self.rank == nrank + 1 {
-                    true
-                } else {
-                    false
+            // let attack = false;
+            // if attack == false {
+                    // } else {
+    //     if self.rank == nrank + 1 && (self.file == nfile + 1 || self.file == nfile - 1) {
+    //         true
+    //     } else {
+    //         false
+    //     }
+    // }
+
+
+            if self.rank == 2 {
+                if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+                    return false;
+        
                 }
-            } else {
-                if self.rank == nrank + 1 && (self.file == nfile + 1 || self.file == nfile - 1) {
-                    true
-                } else {
-                    false
+        
+                if self.rank == nrank - 2 {
+                    return true;
                 }
             }
-        } else {
+
             if self.rank == nrank - 1 {
-                true
+                return true;
             } else {
-                false
+                return false;
+            }
+        } else {
+
+            if self.rank == 7 {
+                if self.rank == nrank + 2 {
+                    return true;
+                }
+            }
+
+            if self.rank == nrank + 1 {
+                return true;
+            } else {
+                return false;
             }
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -182,9 +196,13 @@ pub struct Rook {
 }
 
 impl Rook {    
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
+        }
+        if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+            return false;
+
         }
 
         if self.rank == nrank || self.file == nfile {
@@ -194,12 +212,6 @@ impl Rook {
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -212,7 +224,7 @@ pub struct Knight {
 }
 
 impl Knight {    
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
@@ -229,12 +241,6 @@ impl Knight {
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -247,9 +253,13 @@ pub struct Bishop {
 }
 
 impl Bishop {    
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
+        }
+        if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+            return false;
+
         }
 
         for b in 0..=7 {
@@ -265,12 +275,6 @@ impl Bishop {
         
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -283,9 +287,13 @@ pub struct Queen {
 }
 
 impl Queen {
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
+        }
+        if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+            return false;
+
         }
 
         if self.rank == nrank || self.file == nfile {
@@ -305,12 +313,6 @@ impl Queen {
         
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -323,10 +325,11 @@ pub struct King {
 }
 
 impl King {    
-    fn legal(&self, nrank: i8, nfile: i8) -> bool {
+    fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
+
 
         let pos_c = [self.rank-nrank, self.file-nfile];
 
@@ -340,12 +343,6 @@ impl King {
         }
     }
 
-    fn change(&mut self, nrank: i8, nfile: i8) {
-        if self.legal(nrank, nfile) == true{
-            self.rank = nrank;
-            self.file = nfile;
-        }
-    }
 
 }
 
@@ -400,5 +397,6 @@ pub fn gather_pieces() -> Vec<Piece> {
 
     return pieces;
 }
+
 
 
