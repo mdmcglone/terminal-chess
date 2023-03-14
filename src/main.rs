@@ -155,6 +155,38 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
         println!("CASTLING");
     } 
 
+    let repromote = Regex::new(r"(?m)^[a-h][1-8]=[RNBQ]$").unwrap();
+    if repromote.is_match(&input) {
+        println!("PROMOTION");
+        let pawn_file = input.chars().nth(0).unwrap().to_string();
+        let rank = input.chars().nth(1).unwrap().to_string();
+        let rank = rank.parse::<i8>().unwrap();
+
+        // convert file to i8
+        let file = file_to_num(&pawn_file);
+
+        // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
+
+    }
+    
+    let retakesandpromote = Regex::new(r"(?m)^[a-h]x[a-h][1-8]=[RNBQ]$").unwrap();
+    if retakesandpromote.is_match(&input) {
+        println!("TAKES AND PROMOTION");
+
+        // take the first letter of the input as the pawn name
+        let pawn_file = input.chars().nth(0).unwrap().to_string();
+        // take the third letter of the input as the rank
+        let rank = input.chars().nth(2).unwrap().to_string();
+        let rank = rank.parse::<i8>().unwrap();
+
+        // convert file to i8
+        let file = file_to_num(&pawn_file);
+
+        // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
+
+    }
+
+
     let repawn = Regex::new(r"(?m)^[a-h][1-8]$").unwrap();
     if repawn.is_match(&input) {
 
@@ -170,18 +202,12 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
         return Some((pawn_file, file, rank));
     }
 
+    // standard moves or takes
     let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-8]$|^[RNBQK]x[a-h][1-8]$").unwrap();
     // use the regex string ^[a-zA-Z].*[a-zA-Z][0-9]$ to check if the input is valid
     if !re.is_match(&input) {
         println!("NO MATCH. Please try again.");
         return None;
-    }
-
-    // handle castling
-    if input == "O-O" {
-        return Some((String::from("O-O"), 0, 0));
-    } else if input == "O-O-O" {
-        return Some((String::from("O-O-O"), 0, 0));
     }
 
     // Take the first character of the input as the piece kind
