@@ -71,8 +71,8 @@ fn main() {
 
         
         // extract move_to tuple from the option
-        let (piece_kind, file, rank) = match parsed_input {
-            Some((piece_kind, file, rank)) => (piece_kind, file, rank),
+        let (piece_kind, file, rank, promote_to) = match parsed_input {
+            Some((piece_kind, file, rank, promote_to)) => (piece_kind, file, rank, promote_to),
             None => continue,
         };
 
@@ -116,6 +116,7 @@ fn main() {
             index += 1;
         }
 
+        // remove the piece at the destination square from all_pieces (capture)
         index = 0;
         for piece in all_pieces.iter() {
             if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() != &whose_turn {
@@ -125,15 +126,15 @@ fn main() {
             index += 1;
         }
 
-        let moved_piece = match &piece_kind[..] {
-            "R" => Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            "N" => Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            "B" => Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            "Q" => Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            "K" => Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: piece_kind}),
-            _ => continue,
+
+        let moved_piece = create_moved_piece(piece_kind, rank, file, whose_turn, promote_to);
+
+        // if moved_piece is None, continue, else, unwrap
+        let moved_piece = match moved_piece {
+            Some(moved_piece) => moved_piece,
+            None => continue,
         };
+
 
         // add the moved piece to all_pieces
         all_pieces.push(moved_piece);
@@ -145,17 +146,41 @@ fn main() {
 
 }
 
+fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, promote_to: String) -> Option<Piece> {
+    if promote_to == "none".to_string() {
+        let moved_piece = match &piece_kind[..] {
+            "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            _ => None,
+            };
+            return moved_piece;
+        } else {
+            let moved_piece = match &promote_to[..] {
+                "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: promote_to})),
+                "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: promote_to})),
+                "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: promote_to})),
+                "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: promote_to})),
+                _ => None,
+            };
+            return moved_piece;
+        }
+        println!("Invalid move, try again");
+        return None;
+}
 
 
-
-fn parse_input(input: String) -> Option<(String, i8, i8)> {
+fn parse_input(input: String) -> Option<(String, i8, i8, String)> {
 
     let recastle = Regex::new(r"(?m)^O-O$|^O-O-O$").unwrap();
     if recastle.is_match(&input) {
         println!("CASTLING");
     } 
 
-    let repromote = Regex::new(r"(?m)^[a-h][1-8]=[RNBQ]$").unwrap();
+    let repromote = Regex::new(r"(?m)^[a-h]8=[RNBQ]$").unwrap();
     if repromote.is_match(&input) {
         println!("PROMOTION");
         let pawn_file = input.chars().nth(0).unwrap().to_string();
@@ -164,12 +189,18 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
 
         // convert file to i8
         let file = file_to_num(&pawn_file);
+        
 
         // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
+        // take the last letter of the input as promote_to
+        let promote_to = &input[input.len() - 2..input.len() - 1];
+
+        return Some((pawn_file, file, rank, promote_to.to_string()));
+
 
     }
     
-    let retakesandpromote = Regex::new(r"(?m)^[a-h]x[a-h][1-8]=[RNBQ]$").unwrap();
+    let retakesandpromote = Regex::new(r"(?m)^[a-h]x[a-h]8=[RNBQ]$").unwrap();
     if retakesandpromote.is_match(&input) {
         println!("TAKES AND PROMOTION");
 
@@ -182,12 +213,16 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
         // convert file to i8
         let file = file_to_num(&pawn_file);
 
-        // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
+            // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
+        let promote_to = &input[input.len() - 2..input.len() - 1];
+
+        return Some((pawn_file, file, rank, promote_to.to_string()));
+
 
     }
 
 
-    let repawn = Regex::new(r"(?m)^[a-h][1-8]$").unwrap();
+    let repawn = Regex::new(r"(?m)^[a-h][1-7]$").unwrap();
     if repawn.is_match(&input) {
 
         // take the first letter of the input as the file
@@ -199,11 +234,11 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
         // convert file to i8
         let file = file_to_num(&pawn_file);
 
-        return Some((pawn_file, file, rank));
+        return Some((pawn_file, file, rank, "none".to_string()));
     }
 
     // standard moves or takes
-    let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-8]$|^[RNBQK]x[a-h][1-8]$").unwrap();
+    let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-8]$|^[RNBQK]x[a-h][1-7]$").unwrap();
     // use the regex string ^[a-zA-Z].*[a-zA-Z][0-9]$ to check if the input is valid
     if !re.is_match(&input) {
         println!("NO MATCH. Please try again.");
@@ -222,7 +257,7 @@ fn parse_input(input: String) -> Option<(String, i8, i8)> {
     let rank = rank.parse::<i8>().unwrap();
 
 
-    return Some((piece_kind, file, rank));
+    return Some((piece_kind, file, rank, "none".to_string()));
 }
 
 fn file_to_num (file: &str) -> i8 {
