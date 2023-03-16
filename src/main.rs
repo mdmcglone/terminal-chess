@@ -149,21 +149,21 @@ fn main() {
 fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, promote_to: String) -> Option<Piece> {
     if promote_to == "none".to_string() {
         let moved_piece = match &piece_kind[..] {
-            "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
-            "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
-            "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
-            "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
-            "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
-            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: piece_kind})),
+            "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
             _ => None,
             };
             return moved_piece;
         } else {
             let moved_piece = match &promote_to[..] {
-                "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: promote_to})),
-                "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: promote_to})),
-                "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: promote_to})),
-                "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: promote_to})),
+                "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
+                "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
+                "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
+                "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
                 _ => None,
             };
             return moved_piece;
@@ -175,10 +175,16 @@ fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, 
 
 fn parse_input(input: String) -> Option<(String, i8, i8, String)> {
 
-    let recastle = Regex::new(r"(?m)^O-O$|^O-O-O$").unwrap();
+    let recastle = Regex::new(r"(?m)^O-O$").unwrap();
     if recastle.is_match(&input) {
-        println!("CASTLING");
+        return Some(("R".to_string(), 0, 0, "K".to_string()))
     } 
+
+    let relongcastle = Regex::new(r"(?m)^O-O-O$").unwrap();
+    if recastle.is_match(&input) {
+        return Some(("R".to_string(), 0, 0, "Q".to_string()))
+    } 
+
 
     let repromote = Regex::new(r"(?m)^[a-h]8=[RNBQ]$").unwrap();
     if repromote.is_match(&input) {
