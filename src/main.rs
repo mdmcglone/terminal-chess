@@ -68,13 +68,31 @@ fn main() {
 
         let parsed_input = parse_input(user_input);
 
-
         
         // extract move_to tuple from the option
         let (piece_kind, file, rank, promote_to) = match parsed_input {
             Some((piece_kind, file, rank, promote_to)) => (piece_kind, file, rank, promote_to),
             None => continue,
         };
+
+        // handle castling 
+        if piece_kind == "R".to_string() && promote_to == "K".to_string() {
+            // Kingside castle
+
+            } else if whose_turn == false {
+
+            }
+
+        } else if piece_kind == "R".to_string() && promote_to == "Q".to_string() {
+            // Queenside castle
+            if whose_turn == true {
+
+            } else if whose_turn == false {
+
+            }
+
+        }
+
 
         let mut some_legal_move = 0;
         let mut original_piece = (&0, &0, &String::from("x"));
@@ -281,3 +299,48 @@ fn file_to_num (file: &str) -> i8 {
     };
     return file;
 }
+
+
+
+// if whose_turn == true {
+//     // check if rook on h1 can move to f1
+//     for piece in all_pieces.iter() {
+//         if piece.get_rank() == &1 && piece.get_file() == &8 && piece.get_id() == &"R".to_string() && piece.get_color() ==  &true {
+//             if piece.get_legal(1, 6, &map) == true {
+//                 // remove the rook from all_pieces
+//                 let mut index = 0;
+//                 for piece in all_pieces.iter() {
+//                     if piece.get_rank() == &1 && piece.get_file() == &8 && piece.get_id() == &"R".to_string() && piece.get_color() == &true {
+//                         all_pieces.remove(index);
+//                         break
+//                     }
+//                     index += 1;
+//                 }
+//                 // add the rook to f1
+//                 let moved_piece = create_moved_piece("R".to_string(), 1, 6, true, "x".to_string());
+//                 let moved_piece = match moved_piece {
+//                     Some(moved_piece) => moved_piece,
+//                     None => continue,
+//                 };
+//                 all_pieces.push(moved_piece);
+
+//                 // remove the king from all_pieces
+//                 let mut index = 0;
+//                 for piece in all_pieces.iter() {
+//                     if piece.get_rank() == &1 && piece.get_file() == &5 && piece.get_id() == &"K".to_string() && piece.get_color() == &true {
+//                         all_pieces.remove(index);
+//                         break
+//                     }
+//                     index += 1;
+//                 }
+//                 // add the king to g1
+//                 let moved_piece = create_moved_piece("K".to_string(), 1, 7, true, "x".to_string());
+//                 let moved_piece = match moved_piece {
+//                     Some(moved_piece) => moved_piece,
+//                     None => continue,
+//                 };
+//                 all_pieces.push(moved_piece);
+
+//             }
+//         }
+//     }
