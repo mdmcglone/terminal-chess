@@ -79,6 +79,7 @@ fn main() {
         let mut some_legal_move = 0;
         let mut original_piece = (&0, &0, &String::from("x"));
         let mut illegal_move = false;
+        let mut castling = false;
         for piece in all_pieces.iter() {
             // check that this move does not overlap with another piece on the same team
             if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() == &whose_turn {
@@ -94,41 +95,55 @@ fn main() {
             } 
 
             // hidden case for castling
-            if &rank == &0 && &file == &0 && &piece_kind == "R" {
-                println!("trying to castle");
+            if &rank == &0 && &file == &0 && piece.get_id() == "R" && piece.get_color() == &whose_turn {
                 if whose_turn == true {
-                    if &promote_to == "K" {
+                    if &promote_to == "K" && piece.get_file() == &8 {
                         if piece.get_legal(1, 6, &map) {
                             some_legal_move += 1;
                             original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
+
+                            castling = true;
                         }
-                    } else if &promote_to == "Q" {
+                    } else if &promote_to == "Q" && piece.get_file() == &1 {
                         if piece.get_legal(1, 4, &map) {
                             some_legal_move += 1;
                             original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
+
+                            castling = true;
                         }
                     }
                 } else {
-                    if &promote_to == "K" {
+                    if &promote_to == "K" && piece.get_file() == &8  {
                         if piece.get_legal(8, 6, &map) {
                             some_legal_move += 1;
                             original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
+
+                            castling = true;
                         }
-                    } else if &promote_to == "Q" {
+                    } else if &promote_to == "Q" && piece.get_file() == &1 {
                         if piece.get_legal(8, 4, &map) {
                             some_legal_move += 1;
                             original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
+
+                            castling = true;
                         }
                     }
                 }
             }
-            
         }
+
+        // if castling is true, also check that the king is original
+        // if castling == true {
+        //     for piece in all_pieces.iter() {
+        //         if piece.get_id() != "K" || piece.get_color() != &whose_turn || piece.get_orig() != &true {
+        //             illegal_move = true;   
+        //         }
+        //     }
+        // }
 
         if illegal_move == true {
             continue
         }
-
         if some_legal_move > 1 {
             println!("There are multiple pieces that can move to this square. Please disambiguate.");
             continue
@@ -136,40 +151,6 @@ fn main() {
             println!("This move is not legal.");
             continue
         }
-
-        // // handle castling 
-        // if piece_kind == "R".to_string() && promote_to == "K".to_string() {
-        //     // Kingside castle
-        //     if whose_turn == true {
-        //         // make a new rook on f1
-        //         let castled_rook = create_moved_piece("R".to_string(), 1, 6, true, "x".to_string());
-        //         let castled_rook = match castled_rook {
-        //             Some(castled_rook) => castled_rook,
-        //             None => continue,
-        //         };
-
-        //         // make a new king on g1
-        //         let castled_king = create_moved_piece("K".to_string(), 1, 7, true, "x".to_string());
-        //         let castled_king = match castled_king {
-        //             Some(castled_king) => castled_king,
-        //             None => continue,
-        //         };
-
-        //     } else if whose_turn == false {
-
-
-        //     }
-
-        // } else if piece_kind == "R".to_string() && promote_to == "Q".to_string() {
-        //     // Queenside castle
-        //     if whose_turn == true {
-
-        //     } else if whose_turn == false {
-
-        //     }
-
-        // }
-
 
         // remove the original piece from all_pieces
         let mut index = 0;
@@ -191,24 +172,64 @@ fn main() {
             index += 1;
         }
 
+        if castling == false {
+            let moved_piece = create_moved_piece(piece_kind, rank, file, whose_turn, promote_to);
+        
+            // if moved_piece is None, continue, else, unwrap
+            let moved_piece = match moved_piece {
+                Some(moved_piece) => moved_piece,
+                None => continue,
+            };
 
-        let moved_piece = create_moved_piece(piece_kind, rank, file, whose_turn, promote_to);
+            // add the moved piece to all_pieces
+            all_pieces.push(moved_piece);
 
-        // if moved_piece is None, continue, else, unwrap
-        let moved_piece = match moved_piece {
-            Some(moved_piece) => moved_piece,
-            None => continue,
-        };
+        } else {
+            // remove this team's king
+            index = 0;
+            for piece in all_pieces.iter() {
+                if piece.get_id() == "K" && piece.get_color() == &whose_turn {
+                    all_pieces.remove(index);
+                    break
+                }
+                index += 1;
+            }
 
+            let castled_pieces = create_castled_pieces(whose_turn, promote_to);
+          
 
-        // add the moved piece to all_pieces
-        all_pieces.push(moved_piece);
+            // push both castled pieces to all_pieces
+            all_pieces.push(castled_pieces.0);
+            all_pieces.push(castled_pieces.1);
+
+        }
+
 
 
 
         turn_count += 1;
     }
 
+}
+
+fn create_castled_pieces(whose_turn: bool, promote_to: String) -> (Piece, Piece) {
+    if whose_turn == true && &promote_to == "K" {
+        let castled_rook = Piece::Rook(Rook{rank: 1, file: 6, yt: whose_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 1, file: 7, yt: whose_turn, id: "K".to_string(), orig: false});
+        return (castled_rook, castled_king)
+    } else if whose_turn == true && &promote_to == "Q" {
+        let castled_rook = Piece::Rook(Rook{rank: 1, file: 4, yt: whose_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 1, file: 3, yt: whose_turn, id: "K".to_string(), orig: false});
+        return (castled_rook, castled_king)
+    } else if whose_turn == false && &promote_to == "K" {
+        let castled_rook = Piece::Rook(Rook{rank: 8, file: 6, yt: whose_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 8, file: 7, yt: whose_turn, id: "K".to_string(), orig: false});
+        return (castled_rook, castled_king)
+    } else { // if whose_turn == false && &promote_to == "Q" {
+        let castled_rook = Piece::Rook(Rook{rank: 8, file: 4, yt: whose_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 8, file: 3, yt: whose_turn, id: "K".to_string(), orig: false});
+        return (castled_rook, castled_king)
+    }
 }
 
 fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, promote_to: String) -> Option<Piece> {
@@ -246,7 +267,7 @@ fn parse_input(input: String) -> Option<(String, i8, i8, String)> {
     } 
 
     let relongcastle = Regex::new(r"(?m)^O-O-O$").unwrap();
-    if recastle.is_match(&input) {
+    if relongcastle.is_match(&input) {
         return Some(("R".to_string(), 0, 0, "Q".to_string()))
     } 
 
