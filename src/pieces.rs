@@ -157,6 +157,20 @@ impl Pawn {
             return false;
         }
 
+        if self.file == nfile {
+            // check the map to see if there is any piece on nrank, nfile
+            if map[nrank as usize][nfile as usize] != "x" {
+                return false;
+            } // what? why isn't this working?
+        }
+
+        if self.file != nfile {
+            // check the map to see if there is any piece on nrank, nfile
+            if map[nrank as usize][nfile as usize] == "x" {
+                return false;
+            }
+        }
+
         if self.yt == true {
             if self.rank == 2 {
                 if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
