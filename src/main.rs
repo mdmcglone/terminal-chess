@@ -240,7 +240,7 @@ fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, 
             "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
             "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
             "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
+            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: num_to_file(&rank), orig: false})),
             _ => None,
             };
             return moved_piece;
@@ -368,3 +368,17 @@ fn file_to_num (file: &str) -> i8 {
     return file;
 }
 
+fn num_to_file (file: &i8) -> String {
+    let file = match file {
+        1 => "a".to_string(),
+        2 => "b".to_string(),
+        3 => "c".to_string(),
+        4 => "d".to_string(),
+        5 => "e".to_string(),
+        6 => "f".to_string(),
+        7 => "g".to_string(),
+        8 => "h".to_string(),
+        _ => "0".to_string(),
+    };
+    return file;
+}
