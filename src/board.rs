@@ -12,7 +12,16 @@ pub fn render_board(blocktop: &str, map: &Vec<Vec<&str>>) {
                 let p = render_piece(map[7-letter][number]);
 
                 //insert piece[layer] into the center of blockbody
-                let mut blockbody_filled = String::from("|           "); // copy blockbody
+                // let mut blockbody_filled = String::from("|           ");
+                // let mut blockbody_filled = String::from("|...........");
+                let odd_or_even = letter+number;
+                let mut blockbody_filled = match odd_or_even%2 {
+                    0 => String::from("|..........."),
+                    1 => String::from("|           "),
+                    _ => String::from("|..........."),
+                };
+
+
                 let len_to_span = blockbody_filled.len() - p[layer].len(); // get length of blockbody to span
                 blockbody_filled = String::from(&blockbody_filled[..len_to_span]);  // trim blockbody to size of p[layer]
                 blockbody_filled.insert_str(blockbody_filled.len()/2+1, p[layer]); // insert p[layer] into center of blockbody
@@ -48,31 +57,31 @@ pub fn render_board(blocktop: &str, map: &Vec<Vec<&str>>) {
 
 fn render_piece(kind: &str) -> [&str; 5] {
     match kind {
-        "WP" => return ["   0   ", "  /-\\  ", "  \\-/  ", "  /-\\  ", " /---\\ "],
-        "BP" => return ["   0   ", "  / \\  ", "  \\ /  ", "  / \\  ", " /___\\ "],
-        "WR" => return ["|| ||| ||","|-------|"," |-----| "," |-----| ","|-------|"],
+        "WP" => return ["   o   ", "  /=\\  ", "  \\=/  ", "  /=\\  ", " /===\\ "],
+        "BP" => return ["   o   ", "  / \\  ", "  \\ /  ", "  / \\  ", " /___\\ "],
+        "WR" => return ["|| ||| ||","|=======|"," |=====| "," |=====| ","|=======|"],
         "BR" => return ["|| ||| ||","|       |"," |     | "," |     | ","|_______|"],
-        "WN" => return ["  ______"," /--- o ","/L -----","\\~~_____","     \\--"],
-        "BN" => return ["  ______"," /    o ","/L      ","\\~~_____","     \\__"],
-        "WB" => return ["    O    ","   /-\\   ","  /---\\  "," /- + -\\ ","~\\-----/~"],
-        "BB" => return ["    O    ","   / \\   ","  /   \\  "," /  +  \\ ","~\\_____/~"],
-        "WQ" => return ["O O O O O","\\-|-|-|-/"," \\-----/ ","  \\---/  "," ======= "],
+        "WN" => return ["   ______","  /=== o "," /L ====="," \\~~_____","      \\=="],
+        "BN" => return ["   ______","  /    o "," /L      "," \\~~_____","      \\__"],
+        "WB" => return ["    o    ","   /=\\   ","  /===\\  "," /JESUS\\ ","~\\=====/~"],
+        "BB" => return ["    o    ","   / \\   ","  /   \\  "," /JESUS\\ ","~\\_____/~"],
+        "WQ" => return ["O O O O O","\\=|=|=|=/"," \\=====/ ","  \\===/  "," ======= "],
         "BQ" => return ["O O O O O","\\ | | | /"," \\     / ","  \\   /  "," ======= "],
-        "WK" => return ["  __+__  "," /--|--\\ "," \\--|--/ "," /--|--\\ ","========="],
-        "BK" => return ["  __+__  "," /  |  \\ "," \\  |  / "," /  |  \\ ","========="],
+        "WK" => return [" ___+___ "," \\=====/ "," /==|==\\ ","/===|===\\","========="],
+        "BK" => return [" ___+___ "," \\     / "," /  |  \\ ","/   |   \\","========="],
         _ => return ["","","","",""],
     }
 }
 
 // white pawn
-//   0
-//  /-\
-//  \-/
-//  /-\
-// /---\
+//   .
+//  /=\
+//  \=/
+//  /=\
+// /===\
 
 // black pawn
-//   0
+//   .
 //  / \
 //  \ /
 //  / \
@@ -80,10 +89,10 @@ fn render_piece(kind: &str) -> [&str; 5] {
 
 // white rook
 // || ||| ||
-// |-------|
-//  |-----|
-//  |-----|
-// |-------|
+// |=======|
+//  |=====|
+//  |=====|
+// |=======|
 
 // black rook
 // || ||| ||
@@ -94,10 +103,10 @@ fn render_piece(kind: &str) -> [&str; 5] {
 
 // white knight
 //    ______
-//   /--- o 
-//  /L -----
-//  \~~_____
-//       \--
+//   /=== o 
+//  /L =====
+//  \≈≈_____
+//       \==
 
 // black knight
 //    ______
@@ -107,14 +116,14 @@ fn render_piece(kind: &str) -> [&str; 5] {
 //       \__
 
 // white bishop
-//      O
-//     /-\
-//    /---\
-//   /- + -\
-//  ~\-----/~
+//      o
+//     /=\
+//    /===\
+//   /= + =\
+//  ~\=====/~
 
 // black bishop
-//      O
+//      o
 //     / \
 //    /   \
 //   /  +  \
@@ -122,9 +131,9 @@ fn render_piece(kind: &str) -> [&str; 5] {
 
 // white queen
 //O O O O O
-//\-|-|-|-/
-// \-----/
-//  \---/
+//\=|=|=|=/
+// \=====/
+//  \===/
 // =======
 
 // black queen
@@ -136,19 +145,19 @@ fn render_piece(kind: &str) -> [&str; 5] {
 
 
 // white king
-//   __+__
-//  /--|--\
-//  \--|--/
-//  /--|--\
+//  ___+___
+//  \=====/
+//  /==|==\
+// /===|===\
 // =========
 
 
 // black king
-//   __+__
+//  ___+___
+//  \     /
 //  /  |  \
-//  \  |  /
-//  /  |  \
-// =========
+// /   |   \
+// ==========
 
 
 // color square white:
@@ -158,4 +167,18 @@ fn render_piece(kind: &str) -> [&str; 5] {
 // |···········|
 // |···········|
 // -------------
+
+// black bishop
+//      +
+//    /   \
+//   |jesus|
+//    \   /
+//   ~~\ /~~
+
+// white bishop
+//      +
+//    /   \
+//   |jesus|
+//    \   /
+//   ~~\ /~~
 
