@@ -149,52 +149,66 @@ pub struct Pawn {
 
 impl Pawn {
     fn legal(&self, nrank: i8, nfile: i8, map: &Vec<Vec<&str>>) -> bool {
+
+        // print all detais for debugging
+        // println!("  nrank: {} nfile: {}", nrank, nfile);
+        // println!(" map: {:?} ", map);
+
         if on_board_and_diff(&self.rank, &self.file, &nrank, &nfile) == false {
             return false;
         }
 
         if self.file != nfile + 1 && self.file != nfile - 1 && self.file != nfile {
+            println!("illegal file");
             return false;
         }
+
     
         if self.file == nfile {
             // check the map to see if there is any piece on nrank, nfile
             if map[nrank as usize - 1][nfile as usize - 1] != "x" {
+                println!("if straight, moving into piece");
                 return false;
             } 
         }
+
 
         if self.file != nfile {
             // check the map to see if there is any piece on nrank, nfile
             if map[nrank as usize - 1][nfile as usize - 1] == "x" {
+                println!("if diagonal, not moving into piece");
                 return false;
             } 
         }
 
+
         if self.yt == true {
             if self.rank == 2 {
-                if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
-                    return false;
-                }
-        
                 if self.rank == nrank - 2 {
-                    return true;
+                    if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+                        println!("trace move failed");
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
 
             if self.rank == nrank - 1 {
+                println!(" Pawn: {} {} {} {} {}", self.rank, self.file, self.yt, self.id, self.orig);
                 return true;
             } else {
+                println!("rank failed");
                 return false;
             }
         } else {
-            if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
-                return false;
-            }
-
             if self.rank == 7 {
                 if self.rank == nrank + 2 {
-                    return true;
+                    if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
 

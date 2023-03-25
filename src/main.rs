@@ -240,7 +240,7 @@ fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, 
             "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
             "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
             "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: num_to_file(&rank), orig: false})),
+            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: num_to_file(&file), orig: false})),
             _ => None,
             };
             return moved_piece;
@@ -298,12 +298,13 @@ fn parse_input(input: String) -> Option<(String, i8, i8, String)> {
 
         // take the first letter of the input as the pawn name
         let pawn_file = input.chars().nth(0).unwrap().to_string();
+        let prom_file = input.chars().nth(2).unwrap().to_string();
         // take the third letter of the input as the rank
-        let rank = input.chars().nth(2).unwrap().to_string();
+        let rank = input.chars().nth(3).unwrap().to_string();
         let rank = rank.parse::<i8>().unwrap();
 
         // convert file to i8
-        let file = file_to_num(&pawn_file);
+        let file = file_to_num(&prom_file);
 
             // This is sticky! We need to return the piece kind as a string, but we don't know what it is yet.
         let promote_to = &input[input.len() - 2..input.len() - 1];
@@ -330,7 +331,7 @@ fn parse_input(input: String) -> Option<(String, i8, i8, String)> {
     }
 
     // standard moves or takes
-    let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-8]$|^[RNBQK]x[a-h][1-7]$").unwrap();
+    let re = Regex::new(r"(?m)^[RNBQK][a-h][1-8]$|^[a-h]x[a-h][1-7]$|^[RNBQK]x[a-h][1-8]$").unwrap();
     // use the regex string ^[a-zA-Z].*[a-zA-Z][0-9]$ to check if the input is valid
     if !re.is_match(&input) {
         println!("NO MATCH. Please try again.");
