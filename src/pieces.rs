@@ -159,7 +159,6 @@ impl Pawn {
         }
 
         if self.file != nfile + 1 && self.file != nfile - 1 && self.file != nfile {
-            println!("illegal file");
             return false;
         }
 
@@ -167,7 +166,6 @@ impl Pawn {
         if self.file == nfile {
             // check the map to see if there is any piece on nrank, nfile
             if map[nrank as usize - 1][nfile as usize - 1] != "x" {
-                println!("if straight, moving into piece");
                 return false;
             } 
         }
@@ -176,7 +174,6 @@ impl Pawn {
         if self.file != nfile {
             // check the map to see if there is any piece on nrank, nfile
             if map[nrank as usize - 1][nfile as usize - 1] == "x" {
-                println!("if diagonal, not moving into piece");
                 return false;
             } 
         }
@@ -186,7 +183,6 @@ impl Pawn {
             if self.rank == 2 {
                 if self.rank == nrank - 2 {
                     if trace_move(&self.rank, &self.file, &nrank, &nfile, &map) == false {
-                        println!("trace move failed");
                         return false;
                     } else {
                         return true;
@@ -195,10 +191,8 @@ impl Pawn {
             }
 
             if self.rank == nrank - 1 {
-                println!(" Pawn: {} {} {} {} {}", self.rank, self.file, self.yt, self.id, self.orig);
                 return true;
             } else {
-                println!("rank failed");
                 return false;
             }
         } else {

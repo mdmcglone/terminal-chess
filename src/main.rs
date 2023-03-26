@@ -1,6 +1,7 @@
 use chess::pieces::gather_pieces;
 use chess::pieces::{Piece, Pawn, Knight, Bishop, Rook, Queen, King};
 use chess::board::render_board;
+use chess::legality::check_check;
 use std::io;
 use regex::Regex;
 
@@ -53,13 +54,13 @@ fn main() {
         // 3. If singular, recreate piece with new rank and file. Else, disambiguate.
 
         //  Let's set up IO first
-        let mut whose_turn = true;
+        let mut white_turn = true;
         if turn_count % 2 == 0 {
             println!("\nIt's white's turn. Enter your move: ");
-            whose_turn = true;
+            white_turn = true;
         } else {
             println!("\nIt's black's turn. Enter your move: ");
-            whose_turn = false;
+            white_turn = false;
         }
 
         let mut user_input = String::new();
@@ -82,21 +83,21 @@ fn main() {
         let mut castling = false;
         for piece in all_pieces.iter() {
             // check that this move does not overlap with another piece on the same team
-            if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() == &whose_turn {
+            if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() == &white_turn {
                 println!("You cannot move to a square occupied by your own piece. Please try again.");
                 illegal_move = true;
                 break
             }
 
             // check that this move is legal for some piece
-            if piece.get_legal(rank, file, &map) == true && piece.get_color() == &whose_turn && piece.get_id() == &piece_kind {
+            if piece.get_legal(rank, file, &map) == true && piece.get_color() == &white_turn && piece.get_id() == &piece_kind {
                 some_legal_move += 1;
                 original_piece = (piece.get_rank(), piece.get_file(), piece.get_id());
             } 
 
             // hidden case for castling
-            if &rank == &0 && &file == &0 && piece.get_id() == "R" && piece.get_color() == &whose_turn {
-                if whose_turn == true {
+            if &rank == &0 && &file == &0 && piece.get_id() == "R" && piece.get_color() == &white_turn {
+                if white_turn == true {
                     if &promote_to == "K" && piece.get_file() == &8 {
                         if piece.get_legal(1, 6, &map) {
                             some_legal_move += 1;
@@ -135,11 +136,31 @@ fn main() {
         // if castling is true, also check that the king is original
         // if castling == true {
         //     for piece in all_pieces.iter() {
-        //         if piece.get_id() != "K" || piece.get_color() != &whose_turn || piece.get_orig() != &true {
+        //         if piece.get_id() != "K" || piece.get_color() != &white_turn || piece.get_orig() != &true {
         //             illegal_move = true;   
         //         }
         //     }
         // }
+
+        // check if king is in check
+        // first, if you're not moving the king 
+        if original_piece.2 != "K" {
+                for piece in all_pieces.iter() {
+                    if piece.get_id() == "K" && piece.get_color() == &white_turn {
+                        if check_check(&white_turn, piece.get_rank(), piece.get_file(), &map) == true {
+                            println!("You must protect your king. Please try again.");
+                            illegal_move = true;
+                            break
+                        }
+                    }
+                }
+        } else {
+            // if you are moving the king, use theking's new position
+            if check_check(&white_turn, &rank, &file, &map) == true {
+                println!("You cannot move into check. Please try again.");
+                illegal_move = true;
+            }        
+        }
 
         if illegal_move == true {
             continue
@@ -165,7 +186,7 @@ fn main() {
         // remove the piece at the destination square from all_pieces (capture)
         index = 0;
         for piece in all_pieces.iter() {
-            if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() != &whose_turn {
+            if piece.get_rank() == &rank && piece.get_file() == &file && piece.get_color() != &white_turn {
                 all_pieces.remove(index);
                 break
             }
@@ -173,7 +194,7 @@ fn main() {
         }
 
         if castling == false {
-            let moved_piece = create_moved_piece(piece_kind, rank, file, whose_turn, promote_to);
+            let moved_piece = create_moved_piece(piece_kind, rank, file, white_turn, promote_to);
         
             // if moved_piece is None, continue, else, unwrap
             let moved_piece = match moved_piece {
@@ -188,14 +209,14 @@ fn main() {
             // remove this team's king
             index = 0;
             for piece in all_pieces.iter() {
-                if piece.get_id() == "K" && piece.get_color() == &whose_turn {
+                if piece.get_id() == "K" && piece.get_color() == &white_turn {
                     all_pieces.remove(index);
                     break
                 }
                 index += 1;
             }
 
-            let castled_pieces = create_castled_pieces(whose_turn, promote_to);
+            let castled_pieces = create_castled_pieces(white_turn, promote_to);
           
 
             // push both castled pieces to all_pieces
@@ -212,44 +233,48 @@ fn main() {
 
 }
 
-fn create_castled_pieces(whose_turn: bool, promote_to: String) -> (Piece, Piece) {
-    if whose_turn == true && &promote_to == "K" {
-        let castled_rook = Piece::Rook(Rook{rank: 1, file: 6, yt: whose_turn, id: "R".to_string(), orig: false});
-        let castled_king = Piece::King(King{rank: 1, file: 7, yt: whose_turn, id: "K".to_string(), orig: false});
+
+
+
+
+fn create_castled_pieces(white_turn: bool, promote_to: String) -> (Piece, Piece) {
+    if white_turn == true && &promote_to == "K" {
+        let castled_rook = Piece::Rook(Rook{rank: 1, file: 6, yt: white_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 1, file: 7, yt: white_turn, id: "K".to_string(), orig: false});
         return (castled_rook, castled_king)
-    } else if whose_turn == true && &promote_to == "Q" {
-        let castled_rook = Piece::Rook(Rook{rank: 1, file: 4, yt: whose_turn, id: "R".to_string(), orig: false});
-        let castled_king = Piece::King(King{rank: 1, file: 3, yt: whose_turn, id: "K".to_string(), orig: false});
+    } else if white_turn == true && &promote_to == "Q" {
+        let castled_rook = Piece::Rook(Rook{rank: 1, file: 4, yt: white_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 1, file: 3, yt: white_turn, id: "K".to_string(), orig: false});
         return (castled_rook, castled_king)
-    } else if whose_turn == false && &promote_to == "K" {
-        let castled_rook = Piece::Rook(Rook{rank: 8, file: 6, yt: whose_turn, id: "R".to_string(), orig: false});
-        let castled_king = Piece::King(King{rank: 8, file: 7, yt: whose_turn, id: "K".to_string(), orig: false});
+    } else if white_turn == false && &promote_to == "K" {
+        let castled_rook = Piece::Rook(Rook{rank: 8, file: 6, yt: white_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 8, file: 7, yt: white_turn, id: "K".to_string(), orig: false});
         return (castled_rook, castled_king)
-    } else { // if whose_turn == false && &promote_to == "Q" {
-        let castled_rook = Piece::Rook(Rook{rank: 8, file: 4, yt: whose_turn, id: "R".to_string(), orig: false});
-        let castled_king = Piece::King(King{rank: 8, file: 3, yt: whose_turn, id: "K".to_string(), orig: false});
+    } else { // if white_turn == false && &promote_to == "Q" {
+        let castled_rook = Piece::Rook(Rook{rank: 8, file: 4, yt: white_turn, id: "R".to_string(), orig: false});
+        let castled_king = Piece::King(King{rank: 8, file: 3, yt: white_turn, id: "K".to_string(), orig: false});
         return (castled_rook, castled_king)
     }
 }
 
-fn create_moved_piece(piece_kind: String, rank: i8, file: i8, whose_turn: bool, promote_to: String) -> Option<Piece> {
+fn create_moved_piece(piece_kind: String, rank: i8, file: i8, white_turn: bool, promote_to: String) -> Option<Piece> {
     if promote_to == "none".to_string() {
         let moved_piece = match &piece_kind[..] {
-            "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "K" => Some(Piece::King(King{rank: rank, file: file, yt: whose_turn, id: piece_kind, orig: false})),
-            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: whose_turn, id: num_to_file(&file), orig: false})),
+            "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: white_turn, id: piece_kind, orig: false})),
+            "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: white_turn, id: piece_kind, orig: false})),
+            "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: white_turn, id: piece_kind, orig: false})),
+            "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: white_turn, id: piece_kind, orig: false})),
+            "K" => Some(Piece::King(King{rank: rank, file: file, yt: white_turn, id: piece_kind, orig: false})),
+            "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" => Some(Piece::Pawn(Pawn{rank: rank, file: file, yt: white_turn, id: num_to_file(&file), orig: false})),
             _ => None,
             };
             return moved_piece;
         } else {
             let moved_piece = match &promote_to[..] {
-                "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
-                "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
-                "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
-                "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: whose_turn, id: promote_to, orig: false})),
+                "R" => Some(Piece::Rook(Rook{rank: rank, file: file, yt: white_turn, id: promote_to, orig: false})),
+                "N" => Some(Piece::Knight(Knight{rank: rank, file: file, yt: white_turn, id: promote_to, orig: false})),
+                "B" => Some(Piece::Bishop(Bishop{rank: rank, file: file, yt: white_turn, id: promote_to, orig: false})),
+                "Q" => Some(Piece::Queen(Queen{rank: rank, file: file, yt: white_turn, id: promote_to, orig: false})),
                 _ => None,
             };
             return moved_piece;
